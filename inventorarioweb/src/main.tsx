@@ -1,10 +1,22 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
-import './index.css'
+import { TooltipProvider } from '@radix-ui/react-tooltip';
+import './styles/global.css'
+import { BrowserRouter } from 'react-router-dom'
+import Sidebar from './components/ui/sidebar.tsx';
+import Header from './components/ui/header.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <div className="flex min-h-screen w-full flex-col bg-muted/40">
+        <TooltipProvider>
+          <Sidebar/><Header /> {/* Cabeçalho */}
+          {/* Outros componentes */}
+        </TooltipProvider> {/* Sidebar deve aparecer no lado esquerdo */}
+        <App />     {/* Aplicação principal */}
+      </div>
+    </BrowserRouter>
   </StrictMode>,
 )
