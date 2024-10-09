@@ -90,14 +90,18 @@ const Sidebar = () => {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              to="#"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              to="/transactions"
+              className={`flex h-9 w-9 items-center justify-center rounded-lg 
+                ${activeIcon === "transactions" ? "bg-accent text-accent-foreground" : "text-muted-foreground"} 
+                transition-colors hover:text-foreground md:h-8 md:w-8`}
+                onClick={() => handleIconClick("transactions")}
+
             >
               <LineChart className="h-5 w-5" />
-              <span className="sr-only">Analytics</span>
+              <span className="sr-only">Transações</span>
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="right">Analytics</TooltipContent>
+          <TooltipContent side="right">Transações</TooltipContent>
         </Tooltip>
       </nav>
 

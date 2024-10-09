@@ -12,10 +12,12 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
         <TooltipProvider>
-          <Sidebar/><Header /> {/* Cabeçalho */}
-          {/* Outros componentes */}
-        </TooltipProvider> {/* Sidebar deve aparecer no lado esquerdo */}
-        <App />     {/* Aplicação principal */}
+          <Sidebar />
+          <Header />
+        </TooltipProvider>
+        <div className="ml-12 flex-1">
+          <App />
+        </div>
       </div>
     </BrowserRouter>
   </StrictMode>,

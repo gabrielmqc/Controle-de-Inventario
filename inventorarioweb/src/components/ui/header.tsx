@@ -22,6 +22,7 @@ const Header = () => {
             "/orders": "Pedidos",
             "/customers": "Clientes",
             "/products": "Produtos",
+            "/transactions": "Transações",
             // Adicione mais mapeamentos de rota conforme necessário
         };
 
