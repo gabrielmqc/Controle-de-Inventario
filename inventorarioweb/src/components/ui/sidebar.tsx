@@ -1,6 +1,6 @@
 import {
   Home,
-  LineChart,
+  BadgeDollarSign,
   Package2,
   Package,
   ShoppingCart,
@@ -113,7 +113,7 @@ const Sidebar = () => {
                 onClick={() => handleIconClick("transactions")}
 
             >
-              <LineChart className="h-5 w-5" />
+              <BadgeDollarSign className="h-5 w-5" />
               <span className="sr-only">Transações</span>
             </Link>
           </TooltipTrigger>
