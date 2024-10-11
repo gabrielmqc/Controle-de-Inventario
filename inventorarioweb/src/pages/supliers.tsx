@@ -6,12 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListFilter, PlusCircle, MoreHorizontal } from "lucide-react";
 import { Table } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 
-const Products = () => {
+const Supliers = () => {
     const [checkedItem, setCheckedItem] = useState<string | null>(null);
+
+
     return (
 
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -42,19 +44,10 @@ const Products = () => {
                                     onCheckedChange={() => setCheckedItem('nome')}>
                                     Nome
                                 </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem checked={checkedItem === 'fornecedor'}
-                                    onCheckedChange={() => setCheckedItem('fornecedor')}>
-                                    Fornecedor
+                                <DropdownMenuCheckboxItem checked={checkedItem === 'contato'}
+                                    onCheckedChange={() => setCheckedItem('contato')}>
+                                    Contato
                                 </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem checked={checkedItem === 'precoCrescente'}
-                                    onCheckedChange={() => setCheckedItem('precoCreescente')}>
-                                    Preco Crescente
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem checked={checkedItem === 'precoDecrescente'}
-                                    onCheckedChange={() => setCheckedItem('precoDecrescente')}>
-                                    Preco Decrescente
-                                </DropdownMenuCheckboxItem>
-                                
                             </DropdownMenuContent>
                         </DropdownMenu>
                         <Dialog>
@@ -62,13 +55,13 @@ const Products = () => {
                                 <Button size="sm" className="h-7 gap-1">
                                     <PlusCircle className="h-3.5 w-3.5" />
                                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                                        Adicionar Produto
+                                        Adicionar Fornecedor
                                     </span>
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
                                 <DialogHeader>
-                                    <DialogTitle>Adicionar Novo Produto</DialogTitle>
+                                    <DialogTitle>Adicionar Novo Fornecedor</DialogTitle>
                                 </DialogHeader>
                                 {/* Add form fields for new customer here */}
                                 <div className="grid gap-4 py-4">
@@ -80,38 +73,29 @@ const Products = () => {
                                         <Input
                                             id="name"
                                             className="col-span-3"
-                                            placeholder="Nome do produto"
+                                            placeholder="Nome do fornecedor"
                                         />
-                                        <label htmlFor="type" className="text-right">
-                                            Preço
+                                        <label htmlFor="contact" className="text-right">
+                                            Contato
                                         </label>
                                         <Input
-                                            id="price"
+                                            id="contact"
                                             className="col-span-3"
-                                            placeholder="Preço"
+                                            placeholder="Contato"
                                         />
-                                        <label htmlFor="value" className="text-right">
-                                            Descrição
+                                        <label htmlFor="address" className="text-right">
+                                            Endereço
                                         </label>
                                         <Input
-                                            id="description"
+                                            id="address"
                                             className="col-span-3"
-                                            placeholder="Descrição"
+                                            placeholder="Endereço"
                                         />
-                                        <label htmlFor="value" className="text-right">
-                                            Imagem
-                                        </label>
-                                        <Input
-                                            id="image"
-                                            type="file"
-                                            className="col-span-3"
-                                            placeholder="Adicionar Imagem"
-                                        />
-
+                                    
                                     </div>
                                     {/* Add more fields as needed */}
                                 </div>
-                                <Button type="submit">Salvar Produto</Button>
+                                <Button type="submit">Salvar Fornecedor</Button>
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -119,9 +103,9 @@ const Products = () => {
                 <TabsContent value="all">
                     <Card x-chunk="dashboard-06-chunk-0">
                         <CardHeader>
-                            <CardTitle>Produtos</CardTitle>
+                            <CardTitle>Fornecedores</CardTitle>
                             <CardDescription>
-                                Gerencie seus produtos e adicione novos.
+                                Gerencie seus Fornecedores e adicione novos.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -133,12 +117,12 @@ const Products = () => {
                                         </TableHead>
                                         <TableHead>Nome</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Preço</TableHead>
+                                        <TableHead>Documento</TableHead>
                                         <TableHead className="hidden md:table-cell">
                                             Total de vendas
                                         </TableHead>
                                         <TableHead className="hidden md:table-cell">
-                                            Criado em
+                                            Contato
                                         </TableHead>
                                         <TableHead>
                                             <span className="sr-only">Ações</span>
@@ -156,12 +140,12 @@ const Products = () => {
                                         <TableCell>
                                             <Badge variant="outline">Rascunho</Badge>
                                         </TableCell>
-                                        <TableCell>$499.99</TableCell>
+                                        <TableCell>072.935.159-95</TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             25
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            2023-07-12 10:42 AM
+                                            2023-07-12
                                         </TableCell>
                                         <TableCell>
                                             <DropdownMenu>
@@ -177,7 +161,7 @@ const Products = () => {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editarar</DropdownMenuItem>
+                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
                                                     <DropdownMenuItem>Deletar</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -193,12 +177,12 @@ const Products = () => {
                                         <TableCell>
                                             <Badge variant="outline">Ativo</Badge>
                                         </TableCell>
-                                        <TableCell>$129.99</TableCell>
+                                        <TableCell>777.777.888-98</TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             100
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            2023-10-18 03:21 PM
+                                            2023-10-18
                                         </TableCell>
                                         <TableCell>
                                             <DropdownMenu>
@@ -230,12 +214,12 @@ const Products = () => {
                                         <TableCell>
                                             <Badge variant="outline">Ativo</Badge>
                                         </TableCell>
-                                        <TableCell>$39.99</TableCell>
+                                        <TableCell>111.222.111-99</TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             50
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            2023-11-29 08:15 AM
+                                            2023-11-29
                                         </TableCell>
                                         <TableCell>
                                             <DropdownMenu>
@@ -374,7 +358,7 @@ const Products = () => {
                         <CardFooter>
                             <div className="text-xs text-muted-foreground">
                                 Mostrando <strong>1-10</strong> de <strong>32</strong>{" "}
-                                produtos
+                                Fornecedores
                             </div>
                         </CardFooter>
                     </Card>
@@ -384,4 +368,4 @@ const Products = () => {
     );
 };
 
-export default Products;
+export default Supliers;

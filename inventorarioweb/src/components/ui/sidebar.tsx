@@ -5,6 +5,7 @@ import {
   Package,
   ShoppingCart,
   Users2,
+  Store,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "react-router-dom"; // Import do react-router-dom
@@ -86,6 +87,21 @@ const Sidebar = () => {
             </Link>
           </TooltipTrigger>
           <TooltipContent side="right">Clientes</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              to="/supliers"
+              className={`flex h-9 w-9 items-center justify-center rounded-lg 
+                ${activeIcon === "supliers" ? "bg-accent text-accent-foreground" : "text-muted-foreground"} 
+                transition-colors hover:text-foreground md:h-8 md:w-8`}
+              onClick={() => handleIconClick("supliers")}
+            >
+              <Store className="h-5 w-5" />
+              <span className="sr-only">Fornecedores</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Fornecedores</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
