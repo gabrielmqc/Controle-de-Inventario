@@ -9,8 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useProductData } from "@/hook/useProductData";
 
 const Products = () => {
+    const { data } = useProductData();
+    
     const [checkedItem, setCheckedItem] = useState<string | null>(null);
     return (
 
@@ -54,7 +57,7 @@ const Products = () => {
                                     onCheckedChange={() => setCheckedItem('precoDecrescente')}>
                                     Preco Decrescente
                                 </DropdownMenuCheckboxItem>
-                                
+
                             </DropdownMenuContent>
                         </DropdownMenu>
                         <Dialog>
