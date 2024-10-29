@@ -2,16 +2,99 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ListFilter, PlusCircle, MoreHorizontal } from "lucide-react";
 import { Table } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { SuplierData } from "@/@types/SuplierData";
+import { useSuplierData, usePostSuplierData, useUpdateSuplierData, useDeleteSuplierData } from "@/hook/useSuplierData";
 
 const Supliers = () => {
+    const { data } = useSuplierData();
+    const { mutate: addSuplier } = usePostSuplierData();
+    const { mutate: updateSuplier } = useUpdateSuplierData();
+    const { mutate: deleteSuplier } = useDeleteSuplierData();
+
     const [checkedItem, setCheckedItem] = useState<string | null>(null);
+    const [SuplierName, setSuplierName] = useState('');
+    const [SuplierCnpj, setSuplierCnpj] = useState('');
+    const [SuplierContact, setSuplierContact] = useState('');
+    const [SuplierAddress, setSuplierAdress] = useState('');
+    const [currentSuplierId, setCurrentSuplierId] = useState<string | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
+
+
+
+    const handleAddSuplier = () => {
+        const newSuplier = {
+            id: 0,
+            name: SuplierName,
+            cnpj: SuplierCnpj,
+            contact: SuplierContact,
+            address: SuplierAddress,
+        };
+        addSuplier(newSuplier);
+        resetForm();
+    };
+
+    const handleEditSuplier = (Suplier: SuplierData) => {
+        setCurrentSuplierId((Suplier.id).toString());
+        setSuplierName(Suplier.name);
+        setSuplierCnpj(Suplier.cnpj);
+        setSuplierContact(Suplier.contact);
+        setSuplierAdress(Suplier.address);
+        setIsEditDialogOpen(true); // Abre o dialog de edição
+    };
+
+    const handleUpdateSuplier = () => {
+        if (!currentSuplierId) return;
+
+        const updatedSuplier = {
+            id: parseFloat(currentSuplierId),
+            name: SuplierName,
+            cnpj: SuplierCnpj,
+            contact: SuplierContact,
+            address: SuplierAddress,
+        };
+
+        updateSuplier(updatedSuplier);
+        resetForm();
+        setIsEditDialogOpen(false); // Fecha o dialog após a atualização
+    };
+
+    const handleDeleteSuplier = (suplierId: string) => {
+        deleteSuplier(suplierId);
+    };
+
+    const resetForm = () => {
+        setSuplierName('');
+        setSuplierCnpj('');
+        setSuplierContact('');
+        setSuplierAdress('');
+        setCurrentSuplierId(null);
+    };
+
+    // Função para filtrar e ordenar produtos
+    const getFilteredSupliers = () => {
+        if (!data) return [];
+
+        let filteredSupliers = [...data];
+
+        if (searchTerm) {
+            filteredSupliers = filteredSupliers.filter(suplier =>
+                (checkedItem === 'nome' && suplier.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+        }
+
+        return filteredSupliers;
+    };
+
+    const filteredSupliers = getFilteredSupliers();
+
 
 
     return (
@@ -19,14 +102,6 @@ const Supliers = () => {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <Tabs defaultValue="all">
                 <div className="flex items-center">
-                    <TabsList>
-                        <TabsTrigger value="all">Todos</TabsTrigger>
-                        <TabsTrigger value="Ativo">Ativos</TabsTrigger>
-                        <TabsTrigger value="draft">Rascunho</TabsTrigger>
-                        <TabsTrigger value="archived" className="hidden sm:flex">
-                            Arquivado
-                        </TabsTrigger>
-                    </TabsList>
                     <div className="ml-auto flex items-center gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

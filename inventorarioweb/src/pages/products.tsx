@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ListFilter, PlusCircle, MoreHorizontal } from "lucide-react";
 import { Table } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -12,20 +12,19 @@ import { useDeleteProductData, usePostProductData, useProductData, useUpdateProd
 import { ProductData } from "@/@types/ProductData";
 
 const Products = () => {
-    const [checkedItem, setCheckedItem] = useState<string | null>(null);
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
     const { data } = useProductData();
     const { mutate: addProduct } = usePostProductData();
     const { mutate: updateProduct } = useUpdateProductData();
     const { mutate: deleteProduct } = useDeleteProductData();
 
+    const [checkedItem, setCheckedItem] = useState<string | null>(null);
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productQuantity, setProductQuantity] = useState('');
     const [currentProductId, setCurrentProductId] = useState<string | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState<string>(""); // Estado para o texto de filtro
+    const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
 
 
 
@@ -85,7 +84,7 @@ const Products = () => {
 
         if (searchTerm) {
             filteredProducts = filteredProducts.filter(product =>
-                (checkedItem === 'nome' && product.name.toLowerCase().includes(searchTerm.toLowerCase())) 
+                (checkedItem === 'nome' && product.name.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
@@ -109,14 +108,7 @@ const Products = () => {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <Tabs defaultValue="all">
                 <div className="flex items-center">
-                    <TabsList>
-                        <TabsTrigger value="all">Todos</TabsTrigger>
-                        <TabsTrigger value="Ativo">Ativos</TabsTrigger>
-                        <TabsTrigger value="draft">Rascunho</TabsTrigger>
-                        <TabsTrigger value="archived" className="hidden sm:flex">
-                            Arquivado
-                        </TabsTrigger>
-                    </TabsList>
+                   
                     <div className="ml-auto flex items-center gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

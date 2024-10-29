@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardContent }
 import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ListFilter, PlusCircle } from "lucide-react";
 import { Table } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -83,8 +83,8 @@ const Orders = () => {
             </Card>
             <Card x-chunk="dashboard-05-chunk-1">
               <CardHeader className="pb-2">
-                <CardDescription>Essa Semana</CardDescription>
-                <CardTitle className="text-4xl">R$1,329</CardTitle>
+                <CardDescription>Numero de pedidos</CardDescription>
+                <CardTitle className="text-4xl">55</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-xs text-muted-foreground">
@@ -97,7 +97,7 @@ const Orders = () => {
             </Card>
             <Card x-chunk="dashboard-05-chunk-2">
               <CardHeader className="pb-2">
-                <CardDescription>Esse Mês</CardDescription>
+                <CardDescription>Valor total dos pedidos</CardDescription>
                 <CardTitle className="text-4xl">R$5,329</CardTitle>
               </CardHeader>
               <CardContent>
@@ -112,11 +112,6 @@ const Orders = () => {
           </div>
           <Tabs defaultValue="week">
             <div className="flex items-center">
-              <TabsList>
-                <TabsTrigger value="week">Semana</TabsTrigger>
-                <TabsTrigger value="month">Mês</TabsTrigger>
-                <TabsTrigger value="year">Ano</TabsTrigger>
-              </TabsList>
               <div className="ml-auto flex items-center gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -185,7 +180,7 @@ const Orders = () => {
                           Venda
                         </TableCell>
                         <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="secondary">
+                          <Badge className="text-xs" variant="outline">
                             Completo
                           </Badge>
                         </TableCell>

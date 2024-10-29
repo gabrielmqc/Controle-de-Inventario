@@ -9,29 +9,48 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import Sidebar from "@/components/ui/sidebar";
 import Header from "@/components/ui/header";
+import { Fragment } from "react/jsx-runtime";
+import useAuth from "@/hook/useAuth";
+import SignUp from "@/pages/signup";
 
-
-export default function Router() {
-    return (
-        <BrowserRouter>
-            <div className="flex min-h-screen w-full flex-col bg-muted/40">
-                <div className="ml-12 flex-1">
-                    <TooltipProvider>
-                        <Sidebar />
-                        <Header />
-                    </TooltipProvider>
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/orders" element={<Orders />} />
-                        <Route path="/customers" element={<Customers />} />
-                        <Route path="/products" element={<Products />} />
-                        <Route path="/transactions" element={<Transactions />} />
-                        <Route path="/supliers" element={<Supliers />} />
-                    </Routes>
-                </div>
-            </div>
-        </BrowserRouter>
-    )
+interface PrivateProps {
+  Item: React.ComponentType;
 }
 
+const Private = ({ Item }: PrivateProps) => {
+  const { signed } = useAuth();
+  
+  return signed ? (
+    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      <div className="ml-12 flex-1">
+        <TooltipProvider>
+          <Sidebar />
+          <Header />
+        </TooltipProvider>
+        <Item />
+      </div>
+    </div>
+  ) : (
+    <Login />
+  );
+};
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Fragment>
+        <Routes>
+          <Route path="*" element={<Login />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/dashboard" element={<Private Item={Dashboard} />} />
+          <Route path="/orders" element={<Private Item={Orders} />} />
+          <Route path="/customers" element={<Private Item={Customers} />} />
+          <Route path="/products" element={<Private Item={Products} />} />
+          <Route path="/transactions" element={<Private Item={Transactions} />} />
+          <Route path="/supliers" element={<Private Item={Supliers} />} />
+        </Routes>
+      </Fragment>
+    </BrowserRouter>
+  );
+}

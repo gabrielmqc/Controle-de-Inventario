@@ -2,16 +2,97 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ListFilter, PlusCircle, MoreHorizontal } from "lucide-react";
 import { Table } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useClientData, useDeleteClientData, usePostClientData, useUpdateClientData } from "@/hook/useClientData";
+import { ClientData } from "@/@types/ClientData";
 
 const Customers = () => {
+    const { data } = useClientData();
+    const { mutate: addClient } = usePostClientData();
+    const { mutate: updateClient } = useUpdateClientData();
+    const { mutate: deleteClient } = useDeleteClientData();
+
     const [checkedItem, setCheckedItem] = useState<string | null>(null);
+    const [clientName, setClientName] = useState('');
+    const [clientCpfCnpj, setClientCpfCnpj] = useState('');
+    const [clientContact, setClientContact] = useState('');
+    const [clientAddress, setClientAdress] = useState('');
+    const [currentClientId, setCurrentClientId] = useState<string | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
+
+
+
+    const handleAddClient = () => {
+        const newClient = {
+            id: 0,
+            nome: clientName,
+            cpf_cnpj: clientCpfCnpj,
+            contato: clientContact,
+            address: clientAddress,
+        };
+        addClient(newClient);
+        resetForm();
+    };
+
+    const handleEditClient = (client: ClientData) => {
+        setCurrentClientId((client.id).toString());
+        setClientName(client.nome);
+        setClientCpfCnpj(client.cpf_cnpj);
+        setClientContact(client.contato);
+        setClientAdress(client.address);
+        setIsEditDialogOpen(true); // Abre o dialog de edição
+    };
+
+    const handleUpdateClient = () => {
+        if (!currentClientId) return;
+
+        const updatedClient = {
+            id: parseFloat(currentClientId),
+            nome: clientName,
+            cpf_cnpj: clientCpfCnpj,
+            contato: clientContact,
+            address: clientAddress,
+        };
+
+        updateClient(updatedClient);
+        resetForm();
+        setIsEditDialogOpen(false); // Fecha o dialog após a atualização
+    };
+
+    const handleDeleteClient = (clientId: string) => {
+        deleteClient(clientId);
+    };
+
+    const resetForm = () => {
+        setClientName('');
+        setClientCpfCnpj('');
+        setClientContact('');
+        setClientAdress('');
+        setCurrentClientId(null);
+    };
+
+    // Função para filtrar e ordenar produtos
+    const getFilteredClients = () => {
+        if (!data) return [];
+
+        let filteredClients = [...data];
+
+        if (searchTerm) {
+            filteredClients = filteredClients.filter(client =>
+                (checkedItem === 'nome' && client.nome.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+        }
+
+        return filteredClients;
+    };
+
+    const filteredClients = getFilteredClients();
 
 
     return (
@@ -19,14 +100,7 @@ const Customers = () => {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <Tabs defaultValue="all">
                 <div className="flex items-center">
-                    <TabsList>
-                        <TabsTrigger value="all">Todos</TabsTrigger>
-                        <TabsTrigger value="Ativo">Ativos</TabsTrigger>
-                        <TabsTrigger value="draft">Rascunho</TabsTrigger>
-                        <TabsTrigger value="archived" className="hidden sm:flex">
-                            Arquivado
-                        </TabsTrigger>
-                    </TabsList>
+
                     <div className="ml-auto flex items-center gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -67,47 +141,43 @@ const Customers = () => {
                                 <DialogHeader>
                                     <DialogTitle>Adicionar Novo Cliente</DialogTitle>
                                 </DialogHeader>
-                                {/* Add form fields for new customer here */}
                                 <div className="grid gap-4 py-4">
-                                    {/* Example: Name input */}
                                     <div className="grid grid-cols-4 items-center gap-4">
-                                        <label htmlFor="name" className="text-right">
-                                            Nome
-                                        </label>
+                                        <label htmlFor="name" className="text-right">Nome</label>
                                         <Input
                                             id="name"
                                             className="col-span-3"
                                             placeholder="Nome do cliente"
+                                            value={clientName}
+                                            onChange={(e) => setClientName(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="name" className="text-right">
-                                            CPF
-                                        </label>
+                                        <label htmlFor="cpf_cnpj" className="text-right">Descrição</label>
                                         <Input
-                                            id="cpf"
+                                            id="cpf_cnpj"
                                             className="col-span-3"
-                                            placeholder="CPF" 
+                                            placeholder="CPF/CNPJ"
+                                            value={clientCpfCnpj}
+                                            onChange={(e) => setClientCpfCnpj(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="name" className="text-right">
-                                            Email
-                                        </label>
+                                        <label htmlFor="contact" className="text-right">Preço</label>
                                         <Input
-                                            id="email"
+                                            id="contact"
                                             className="col-span-3"
-                                            placeholder="Email"
+                                            placeholder="Contato"
+                                            value={clientContact}
+                                            onChange={(e) => setClientContact(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="name" className="text-right">
-                                            Data de Nascimento
-                                        </label>
+                                        <label htmlFor="address" className="text-right">Quantidade</label>
                                         <Input
-                                            id="dateOfBirth"
-                                            type ="date"
+                                            id="address"
                                             className="col-span-3"
-                                            placeholder="Data de Nascimento"
+                                            placeholder="Escreva seu endereço"
+                                            value={clientAddress}
+                                            onChange={(e) => setClientAdress(e.target.value)} // Atualiza o estado
                                         />
                                     </div>
-                                    {/* Add more fields as needed */}
                                 </div>
-                                <Button type="submit">Salvar Cliente</Button>
+                                <Button onClick={handleAddClient}>Salvar Cliente</Button>
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -128,13 +198,10 @@ const Customers = () => {
                                             <span className="sr-only">Image</span>
                                         </TableHead>
                                         <TableHead>Nome</TableHead>
-                                        <TableHead>Status</TableHead>
                                         <TableHead>Documento</TableHead>
+                                        <TableHead>Contato</TableHead>
                                         <TableHead className="hidden md:table-cell">
-                                            Total de compras
-                                        </TableHead>
-                                        <TableHead className="hidden md:table-cell">
-                                            Data de Nascimento
+                                            Endereço
                                         </TableHead>
                                         <TableHead>
                                             <span className="sr-only">Ações</span>
@@ -142,230 +209,94 @@ const Customers = () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                    {filteredClients.map((client) => (
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Laser Lemonade Machine
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Rascunho</Badge>
-                                        </TableCell>
-                                        <TableCell>072.935.159-95</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            25
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-07-12
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editarar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                        <TableRow key={client.id}>
+                                            <TableCell className="hidden sm:table-cell">
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Hypernova Headphones
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>777.777.888-98</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            100
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-10-18
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            AeroGlow Desk Lamp
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>111.222.111-99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            50
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-11-29
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                            </TableCell>
+                                            <TableCell>{client.nome}</TableCell>
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            TechTonic Energy Drink
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="secondary">Draft</Badge>
-                                        </TableCell>
-                                        <TableCell>$2.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            0
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-12-25 11:59 PM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                            <TableCell>{client.cpf_cnpj}</TableCell>
+                                            <TableCell>{client.contato}</TableCell>
+                                            <TableCell>{client.address}</TableCell>
+                                            <TableCell></TableCell>
+                                            <TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                                        <DropdownMenuItem onClick={() => handleEditClient(client)}>
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDeleteClient(client.id.toString())}>
+                                                            Deletar
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Gamer Gear Pro Controller
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>$59.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            75
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2024-01-01 12:00 AM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Luminous VR Headset
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>$199.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            30
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2024-02-14 02:14 PM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
                                 </TableBody>
                             </Table>
+                            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle>Editar Cliente</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <label htmlFor="name" className="text-right">
+                                                Nome
+                                            </label>
+                                            <Input
+                                                id="name"
+                                                className="col-span-3"
+                                                value={clientName}
+                                                onChange={(e) => setClientName(e.target.value)}
+                                                placeholder="Nome do cliente"
+                                            />
+                                            <label htmlFor="document" className="text-right">
+                                                Documento
+                                            </label>
+                                            <Input
+                                                id="document"
+                                                className="col-span-3"
+                                                value={clientCpfCnpj}
+                                                onChange={(e) => setClientCpfCnpj(e.target.value)}
+                                                placeholder="Documento"
+                                            />
+                                            <label htmlFor="contact" className="text-right">
+                                                Contato
+                                            </label>
+                                            <Input
+                                                id="contact"
+                                                className="col-span-3"
+                                                value={clientContact}
+                                                onChange={(e) => setClientContact(e.target.value)}
+                                                placeholder="Contato"
+                                            />
+                                            <label htmlFor="address" className="text-right">
+                                                Endereço
+                                            </label>
+                                            <Input
+                                                id="address"
+                                                className="col-span-3"
+                                                value={clientAddress}
+                                                onChange={(e) => setClientAdress(e.target.value)}
+                                                placeholder="Endereço"
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button onClick={handleUpdateClient}>Salvar Alterações</Button>
+                                </DialogContent>
+                            </Dialog>
                         </CardContent>
                         <CardFooter>
                             <div className="text-xs text-muted-foreground">
