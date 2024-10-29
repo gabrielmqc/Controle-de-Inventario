@@ -31,9 +31,9 @@ const Customers = () => {
     const handleAddClient = () => {
         const newClient = {
             id: 0,
-            nome: clientName,
+            name: clientName,
             cpf_cnpj: clientCpfCnpj,
-            contato: clientContact,
+            contact: clientContact,
             address: clientAddress,
         };
         addClient(newClient);
@@ -42,9 +42,9 @@ const Customers = () => {
 
     const handleEditClient = (client: ClientData) => {
         setCurrentClientId((client.id).toString());
-        setClientName(client.nome);
+        setClientName(client.name);
         setClientCpfCnpj(client.cpf_cnpj);
-        setClientContact(client.contato);
+        setClientContact(client.contact);
         setClientAdress(client.address);
         setIsEditDialogOpen(true); // Abre o dialog de edição
     };
@@ -54,9 +54,9 @@ const Customers = () => {
 
         const updatedClient = {
             id: parseFloat(currentClientId),
-            nome: clientName,
+            name: clientName,
             cpf_cnpj: clientCpfCnpj,
-            contato: clientContact,
+            contact: clientContact,
             address: clientAddress,
         };
 
@@ -85,7 +85,7 @@ const Customers = () => {
 
         if (searchTerm) {
             filteredClients = filteredClients.filter(client =>
-                (checkedItem === 'nome' && client.nome.toLowerCase().includes(searchTerm.toLowerCase()))
+                (checkedItem === 'nome' && client.name.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
@@ -151,7 +151,7 @@ const Customers = () => {
                                             value={clientName}
                                             onChange={(e) => setClientName(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="cpf_cnpj" className="text-right">Descrição</label>
+                                        <label htmlFor="cpf_cnpj" className="text-right">Documento</label>
                                         <Input
                                             id="cpf_cnpj"
                                             className="col-span-3"
@@ -159,7 +159,7 @@ const Customers = () => {
                                             value={clientCpfCnpj}
                                             onChange={(e) => setClientCpfCnpj(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="contact" className="text-right">Preço</label>
+                                        <label htmlFor="contact" className="text-right">Contato</label>
                                         <Input
                                             id="contact"
                                             className="col-span-3"
@@ -167,7 +167,7 @@ const Customers = () => {
                                             value={clientContact}
                                             onChange={(e) => setClientContact(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="address" className="text-right">Quantidade</label>
+                                        <label htmlFor="address" className="text-right">Endereço</label>
                                         <Input
                                             id="address"
                                             className="col-span-3"
@@ -216,10 +216,10 @@ const Customers = () => {
 
 
                                             </TableCell>
-                                            <TableCell>{client.nome}</TableCell>
+                                            <TableCell>{client.name}</TableCell>
 
                                             <TableCell>{client.cpf_cnpj}</TableCell>
-                                            <TableCell>{client.contato}</TableCell>
+                                            <TableCell>{client.contact}</TableCell>
                                             <TableCell>{client.address}</TableCell>
                                             <TableCell></TableCell>
                                             <TableCell>

@@ -26,9 +26,35 @@ const Products = () => {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
 
+    const [errors, setErrors] = useState({
+        name: '',
+        price: '',
+        quantity: ''
+    });
 
 
     const handleAddProduct = () => {
+        setErrors({ name: '', price: '', quantity: '' });
+
+        let hasErrors = false;
+
+        if (!productName.trim()) {
+            setErrors(prev => ({ ...prev, name: 'Nome é obrigatório' }));
+            hasErrors = true;
+        }
+
+        if (parseFloat(productPrice) <= 0) {
+            setErrors(prev => ({ ...prev, price: 'Preço deve ser maior que zero' }));
+            hasErrors = true;
+        }
+
+        if (parseInt(productQuantity, 10) <= 0) {
+            setErrors(prev => ({ ...prev, quantity: 'Quantidade deve ser maior que zero' }));
+            hasErrors = true;
+        }
+
+        if (hasErrors) return;
+
         const newProduct = {
             id: 0,
             name: productName,
@@ -50,7 +76,11 @@ const Products = () => {
 
     const handleUpdateProduct = () => {
         if (!currentProductId) return;
-
+        // Validate price and quantity
+        if (parseFloat(productPrice) <= 0 || parseInt(productQuantity, 10) <= 0) {
+            alert("Preço e quantidade devem ser maiores que zero");
+            return;
+        }
         const updatedProduct = {
             id: parseFloat(currentProductId),
             name: productName,
@@ -108,7 +138,7 @@ const Products = () => {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <Tabs defaultValue="all">
                 <div className="flex items-center">
-                   
+
                     <div className="ml-auto flex items-center gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -157,6 +187,8 @@ const Products = () => {
                                             value={productName}
                                             onChange={(e) => setProductName(e.target.value)} // Atualiza o estado
                                         />
+                                        {errors.name && <p className="text-red-500 text-xs col-span-4">{errors.name}</p>}
+
                                         <label htmlFor="description" className="text-right">Descrição</label>
                                         <Input
                                             id="description"
@@ -169,18 +201,26 @@ const Products = () => {
                                         <Input
                                             id="price"
                                             className="col-span-3"
+                                            type="number"
+                                            min="0.01"
                                             placeholder="Preço"
                                             value={productPrice}
                                             onChange={(e) => setProductPrice(e.target.value)} // Atualiza o estado
                                         />
+                                        {errors.price && <p className="text-red-500 text-xs col-span-4">{errors.price}</p>}
+
                                         <label htmlFor="quantity" className="text-right">Quantidade</label>
                                         <Input
                                             id="quantity"
                                             className="col-span-3"
+                                            type="number"
+                                            min="1"
                                             placeholder="Adicionar Quantidade"
                                             value={productQuantity}
                                             onChange={(e) => setProductQuantity(e.target.value)} // Atualiza o estado
                                         />
+                                        {errors.quantity && <p className="text-red-500 text-xs col-span-4">{errors.quantity}</p>}
+
                                     </div>
                                 </div>
                                 <Button onClick={handleAddProduct}>Salvar Produto</Button>
@@ -224,7 +264,7 @@ const Products = () => {
                                             </TableCell>
                                             <TableCell>{product.name}</TableCell>
 
-                                            <TableCell>{product.price}</TableCell>
+                                            <TableCell>R$ {product.price}</TableCell>
                                             <TableCell>{product.quantity}</TableCell>
                                             <TableCell>{product.description}</TableCell>
                                             <TableCell></TableCell>

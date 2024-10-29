@@ -1,7 +1,7 @@
 export interface ClientData{
     id: number;
-    nome: string;
+    name: string;
     cpf_cnpj: string;
-    contato: string;
+    contact: string;
     address: string;
     }
