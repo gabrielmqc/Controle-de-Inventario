@@ -5,16 +5,105 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/compon
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListFilter, PlusCircle, MoreHorizontal } from "lucide-react";
 import { Table } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useProductData } from "@/hook/useProductData";
+import { useDeleteProductData, usePostProductData, useProductData, useUpdateProductData } from "@/hook/useProductData";
+import { ProductData } from "@/@types/ProductData";
 
 const Products = () => {
-    const { data } = useProductData();
-    
     const [checkedItem, setCheckedItem] = useState<string | null>(null);
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+    const { data } = useProductData();
+    const { mutate: addProduct } = usePostProductData();
+    const { mutate: updateProduct } = useUpdateProductData();
+    const { mutate: deleteProduct } = useDeleteProductData();
+
+    const [productName, setProductName] = useState('');
+    const [productDescription, setProductDescription] = useState('');
+    const [productPrice, setProductPrice] = useState('');
+    const [productQuantity, setProductQuantity] = useState('');
+    const [currentProductId, setCurrentProductId] = useState<string | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState<string>(""); // Estado para o texto de filtro
+
+
+
+    const handleAddProduct = () => {
+        const newProduct = {
+            id: 0,
+            name: productName,
+            description: productDescription,
+            price: parseFloat(productPrice),
+            quantity: parseInt(productQuantity, 10),
+        };
+        addProduct(newProduct);
+        resetForm();
+    };
+    const handleEditProduct = (product: ProductData) => {
+        setCurrentProductId((product.id).toString());
+        setProductName(product.name);
+        setProductDescription(product.description);
+        setProductPrice(product.price.toString());
+        setProductQuantity(product.quantity.toString());
+        setIsEditDialogOpen(true); // Abre o dialog de edição
+    };
+
+    const handleUpdateProduct = () => {
+        if (!currentProductId) return;
+
+        const updatedProduct = {
+            id: parseFloat(currentProductId),
+            name: productName,
+            description: productDescription,
+            price: parseFloat(productPrice),
+            quantity: parseInt(productQuantity, 10),
+        };
+
+        updateProduct(updatedProduct);
+        resetForm();
+        setIsEditDialogOpen(false); // Fecha o dialog após a atualização
+    };
+
+    const handleDeleteProduct = (productId: string) => {
+        deleteProduct(productId);
+    };
+
+    const resetForm = () => {
+        setProductName('');
+        setProductDescription('');
+        setProductPrice('');
+        setProductQuantity('');
+        setCurrentProductId(null);
+    };
+
+    // Função para filtrar e ordenar produtos
+    const getFilteredProducts = () => {
+        if (!data) return [];
+
+        let filteredProducts = [...data];
+
+        if (searchTerm) {
+            filteredProducts = filteredProducts.filter(product =>
+                (checkedItem === 'nome' && product.name.toLowerCase().includes(searchTerm.toLowerCase())) 
+            );
+        }
+
+        // Filtragem e ordenação
+        if (checkedItem) {
+            if (checkedItem === 'precoCrescente') {
+                filteredProducts.sort((a, b) => a.price - b.price);
+            } else if (checkedItem === 'precoDecrescente') {
+                filteredProducts.sort((a, b) => b.price - a.price);
+            }
+            // Adicione outros filtros aqui conforme necessário, como 'nome' ou 'fornecedor'
+        }
+
+        return filteredProducts;
+    };
+
+    const filteredProducts = getFilteredProducts();
+
     return (
 
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -33,31 +122,24 @@ const Products = () => {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="h-7 gap-1">
                                     <ListFilter className="h-3.5 w-3.5" />
-                                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                                        Filtro
-                                    </span>
+                                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Filtro</span>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuCheckboxItem checked={checkedItem === 'nome'}
-                                    onCheckedChange={() => setCheckedItem('nome')}>
+                                <DropdownMenuCheckboxItem checked={checkedItem === 'nome'} onCheckedChange={() => setCheckedItem(checkedItem === 'nome' ? null : 'nome')}>
                                     Nome
                                 </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem checked={checkedItem === 'fornecedor'}
-                                    onCheckedChange={() => setCheckedItem('fornecedor')}>
+                                <DropdownMenuCheckboxItem checked={checkedItem === 'fornecedor'} onCheckedChange={() => setCheckedItem(checkedItem === 'fornecedor' ? null : 'fornecedor')}>
                                     Fornecedor
                                 </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem checked={checkedItem === 'precoCrescente'}
-                                    onCheckedChange={() => setCheckedItem('precoCreescente')}>
-                                    Preco Crescente
+                                <DropdownMenuCheckboxItem checked={checkedItem === 'precoCrescente'} onCheckedChange={() => setCheckedItem(checkedItem === 'precoCrescente' ? null : 'precoCrescente')}>
+                                    Preço Crescente
                                 </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem checked={checkedItem === 'precoDecrescente'}
-                                    onCheckedChange={() => setCheckedItem('precoDecrescente')}>
-                                    Preco Decrescente
+                                <DropdownMenuCheckboxItem checked={checkedItem === 'precoDecrescente'} onCheckedChange={() => setCheckedItem(checkedItem === 'precoDecrescente' ? null : 'precoDecrescente')}>
+                                    Preço Decrescente
                                 </DropdownMenuCheckboxItem>
-
                             </DropdownMenuContent>
                         </DropdownMenu>
                         <Dialog>
@@ -73,48 +155,43 @@ const Products = () => {
                                 <DialogHeader>
                                     <DialogTitle>Adicionar Novo Produto</DialogTitle>
                                 </DialogHeader>
-                                {/* Add form fields for new customer here */}
                                 <div className="grid gap-4 py-4">
-                                    {/* Example: Name input */}
                                     <div className="grid grid-cols-4 items-center gap-4">
-                                        <label htmlFor="name" className="text-right">
-                                            Nome
-                                        </label>
+                                        <label htmlFor="name" className="text-right">Nome</label>
                                         <Input
                                             id="name"
                                             className="col-span-3"
                                             placeholder="Nome do produto"
+                                            value={productName}
+                                            onChange={(e) => setProductName(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="type" className="text-right">
-                                            Preço
-                                        </label>
-                                        <Input
-                                            id="price"
-                                            className="col-span-3"
-                                            placeholder="Preço"
-                                        />
-                                        <label htmlFor="value" className="text-right">
-                                            Descrição
-                                        </label>
+                                        <label htmlFor="description" className="text-right">Descrição</label>
                                         <Input
                                             id="description"
                                             className="col-span-3"
                                             placeholder="Descrição"
+                                            value={productDescription}
+                                            onChange={(e) => setProductDescription(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="value" className="text-right">
-                                            Imagem
-                                        </label>
+                                        <label htmlFor="price" className="text-right">Preço</label>
                                         <Input
-                                            id="image"
-                                            type="file"
+                                            id="price"
                                             className="col-span-3"
-                                            placeholder="Adicionar Imagem"
+                                            placeholder="Preço"
+                                            value={productPrice}
+                                            onChange={(e) => setProductPrice(e.target.value)} // Atualiza o estado
                                         />
-
+                                        <label htmlFor="quantity" className="text-right">Quantidade</label>
+                                        <Input
+                                            id="quantity"
+                                            className="col-span-3"
+                                            placeholder="Adicionar Quantidade"
+                                            value={productQuantity}
+                                            onChange={(e) => setProductQuantity(e.target.value)} // Atualiza o estado
+                                        />
                                     </div>
-                                    {/* Add more fields as needed */}
                                 </div>
-                                <Button type="submit">Salvar Produto</Button>
+                                <Button onClick={handleAddProduct}>Salvar Produto</Button>
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -135,13 +212,10 @@ const Products = () => {
                                             <span className="sr-only">Image</span>
                                         </TableHead>
                                         <TableHead>Nome</TableHead>
-                                        <TableHead>Status</TableHead>
                                         <TableHead>Preço</TableHead>
+                                        <TableHead>Quantidade em Estoque</TableHead>
                                         <TableHead className="hidden md:table-cell">
-                                            Total de vendas
-                                        </TableHead>
-                                        <TableHead className="hidden md:table-cell">
-                                            Criado em
+                                            Descrição
                                         </TableHead>
                                         <TableHead>
                                             <span className="sr-only">Ações</span>
@@ -149,230 +223,97 @@ const Products = () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                    {filteredProducts.map((product) => (
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Laser Lemonade Machine
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Rascunho</Badge>
-                                        </TableCell>
-                                        <TableCell>$499.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            25
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-07-12 10:42 AM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editarar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                        <TableRow key={product.id}>
+                                            <TableCell className="hidden sm:table-cell">
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Hypernova Headphones
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>$129.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            100
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-10-18 03:21 PM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            AeroGlow Desk Lamp
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>$39.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            50
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-11-29 08:15 AM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                            </TableCell>
+                                            <TableCell>{product.name}</TableCell>
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            TechTonic Energy Drink
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="secondary">Draft</Badge>
-                                        </TableCell>
-                                        <TableCell>$2.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            0
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-12-25 11:59 PM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                            <TableCell>{product.price}</TableCell>
+                                            <TableCell>{product.quantity}</TableCell>
+                                            <TableCell>{product.description}</TableCell>
+                                            <TableCell></TableCell>
+                                            <TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                                        <DropdownMenuItem onClick={() => handleEditProduct(product)}>
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDeleteProduct(product.id.toString())}>
+                                                            Deletar
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Gamer Gear Pro Controller
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>$59.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            75
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2024-01-01 12:00 AM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Luminous VR Headset
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>$199.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            30
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2024-02-14 02:14 PM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
                                 </TableBody>
                             </Table>
+                            {/* Dialog de Edição */}
+                            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle>Editar Produto</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <label htmlFor="name" className="text-right">
+                                                Nome
+                                            </label>
+                                            <Input
+                                                id="name"
+                                                className="col-span-3"
+                                                value={productName}
+                                                onChange={(e) => setProductName(e.target.value)}
+                                                placeholder="Nome do produto"
+                                            />
+                                            <label htmlFor="description" className="text-right">
+                                                Descrição
+                                            </label>
+                                            <Input
+                                                id="description"
+                                                className="col-span-3"
+                                                value={productDescription}
+                                                onChange={(e) => setProductDescription(e.target.value)}
+                                                placeholder="Descrição"
+                                            />
+                                            <label htmlFor="price" className="text-right">
+                                                Preço
+                                            </label>
+                                            <Input
+                                                id="price"
+                                                className="col-span-3"
+                                                type="number"
+                                                value={productPrice}
+                                                onChange={(e) => setProductPrice(e.target.value)}
+                                                placeholder="Preço"
+                                            />
+                                            <label htmlFor="quantity" className="text-right">
+                                                Quantidade
+                                            </label>
+                                            <Input
+                                                id="quantity"
+                                                className="col-span-3"
+                                                type="number"
+                                                value={productQuantity}
+                                                onChange={(e) => setProductQuantity(e.target.value)}
+                                                placeholder="Quantidade"
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button onClick={handleUpdateProduct}>Salvar Alterações</Button>
+                                </DialogContent>
+                            </Dialog>
                         </CardContent>
                         <CardFooter>
                             <div className="text-xs text-muted-foreground">

@@ -1,6 +1,7 @@
 export interface  ProductData {
     id: number;
     name: string;
-    email: string;
-    password: string;
+    description: string;
+    price: number;
+    quantity: number;
 }
