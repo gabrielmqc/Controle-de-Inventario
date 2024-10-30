@@ -10,6 +10,12 @@ const fetchData = async (): AxiosPromise<ClientData[]> => {
   return response;
 };
 
+// Função para buscar a contagem de clientes
+const fetchClientCount = async (): AxiosPromise<number> => {
+  const response = axios.get(API_URL + '/clients/count');
+  return response;
+};
+
 // Função para criar um novo produto (POST)
 const postData = async (newClient: ClientData): AxiosPromise<ClientData> => {
   const response = axios.post(API_URL + '/clients', newClient);
@@ -37,6 +43,19 @@ export function useClientData() {
   return {
     ...query,
     data: query.data?.data,
+  };
+}
+
+export function useClientCount() {
+  const query = useQuery({
+    queryFn: fetchClientCount,
+    queryKey: ['client-count'],
+    retry: 2,
+  });
+
+  return {
+    ...query,
+    data: query.data?.data, // retorna o número total de clientes
   };
 }
 

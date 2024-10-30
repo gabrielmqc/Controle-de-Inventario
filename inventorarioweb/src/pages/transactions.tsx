@@ -7,10 +7,40 @@ import { ListFilter } from "lucide-react";
 import { Table } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { useTransactionData } from "@/hook/useTransactionData";
 
 const Transactions = () => {
     const [checkedItem, setCheckedItem] = useState<string | null>(null);
+    const { data } = useTransactionData();
+    const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
 
+    const getFilteredTransactions = () => {
+        if (!data) return [];
+
+        let filteredTransactions = [...data];
+
+        if (checkedItem === 'entradas') {
+            filteredTransactions = filteredTransactions.filter(transaction =>
+                transaction.type === 'ENTRADA'
+            );
+        }
+
+        if (checkedItem === 'saidas') {
+            filteredTransactions = filteredTransactions.filter(transaction =>
+                transaction.type === 'SAIDA'
+            );
+        }
+
+        if (checkedItem === 'data') {
+            filteredTransactions = filteredTransactions.sort((a, b) =>
+                new Date(b.data).getTime() - new Date(a.data).getTime()
+            );
+        }
+
+        return filteredTransactions;
+    };
+
+    const filteredTransactions = getFilteredTransactions();
 
     return (
 
@@ -45,7 +75,7 @@ const Transactions = () => {
                                 </DropdownMenuCheckboxItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                       
+
                     </div>
                 </div>
                 <TabsContent value="all">
@@ -66,50 +96,17 @@ const Transactions = () => {
                                         <TableHead>Produto</TableHead>
                                         <TableHead>Tipo</TableHead>
                                         <TableHead>Valor</TableHead>
-                                        
+
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Abacate
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Entrada</Badge>
-                                        </TableCell>
-                                        <TableCell>R$ 239,55</TableCell>
-                                      
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Manga
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Saida</Badge>
-                                        </TableCell>
-                                        <TableCell>R$ 899,88</TableCell>
-                                       
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            AeroGlow Desk Lamp
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Entrada</Badge>
-                                        </TableCell>
-                                        <TableCell>R$ 500,00</TableCell>
-                                      
-                                    </TableRow>
-                                   
+                                    {filteredTransactions.map((transaction) => (
+                                        <TableRow key={transaction.id}>
+                                            <TableCell className="hidden sm:table-cell"></TableCell>
+                                            
+                                            <TableCell>R$ {transaction.value.toFixed(2)}</TableCell>
+                                        </TableRow>
+                                    ))}
                                 </TableBody>
                             </Table>
                         </CardContent>

@@ -5,7 +5,6 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/compon
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ListFilter, PlusCircle, MoreHorizontal } from "lucide-react";
 import { Table } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -19,10 +18,10 @@ const Supliers = () => {
     const { mutate: deleteSuplier } = useDeleteSuplierData();
 
     const [checkedItem, setCheckedItem] = useState<string | null>(null);
-    const [SuplierName, setSuplierName] = useState('');
-    const [SuplierCnpj, setSuplierCnpj] = useState('');
-    const [SuplierContact, setSuplierContact] = useState('');
-    const [SuplierAddress, setSuplierAdress] = useState('');
+    const [suplierName, setSuplierName] = useState('');
+    const [suplierCnpj, setSuplierCnpj] = useState('');
+    const [suplierContact, setSuplierContact] = useState('');
+    const [suplierAddress, setSuplierAdress] = useState('');
     const [currentSuplierId, setCurrentSuplierId] = useState<string | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
@@ -32,10 +31,10 @@ const Supliers = () => {
     const handleAddSuplier = () => {
         const newSuplier = {
             id: 0,
-            name: SuplierName,
-            cnpj: SuplierCnpj,
-            contact: SuplierContact,
-            address: SuplierAddress,
+            name: suplierName,
+            cnpj: suplierCnpj,
+            contact: suplierContact,
+            address: suplierAddress,
         };
         addSuplier(newSuplier);
         resetForm();
@@ -55,10 +54,10 @@ const Supliers = () => {
 
         const updatedSuplier = {
             id: parseFloat(currentSuplierId),
-            name: SuplierName,
-            cnpj: SuplierCnpj,
-            contact: SuplierContact,
-            address: SuplierAddress,
+            name: suplierName,
+            cnpj: suplierCnpj,
+            contact: suplierContact,
+            address: suplierAddress,
         };
 
         updateSuplier(updatedSuplier);
@@ -138,39 +137,43 @@ const Supliers = () => {
                                 <DialogHeader>
                                     <DialogTitle>Adicionar Novo Fornecedor</DialogTitle>
                                 </DialogHeader>
-                                {/* Add form fields for new customer here */}
                                 <div className="grid gap-4 py-4">
-                                    {/* Example: Name input */}
                                     <div className="grid grid-cols-4 items-center gap-4">
-                                        <label htmlFor="name" className="text-right">
-                                            Nome
-                                        </label>
+                                        <label htmlFor="name" className="text-right">Nome</label>
                                         <Input
                                             id="name"
                                             className="col-span-3"
                                             placeholder="Nome do fornecedor"
+                                            value={suplierName}
+                                            onChange={(e) => setSuplierName(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="contact" className="text-right">
-                                            Contato
-                                        </label>
+                                        <label htmlFor="cnpj" className="text-right">CNPJ</label>
+                                        <Input
+                                            id="cnpj"
+                                            className="col-span-3"
+                                            placeholder="CNPJ"
+                                            value={suplierCnpj}
+                                            onChange={(e) => setSuplierCnpj(e.target.value)} // Atualiza o estado
+                                        />
+                                        <label htmlFor="contact" className="text-right">Contato</label>
                                         <Input
                                             id="contact"
                                             className="col-span-3"
                                             placeholder="Contato"
+                                            value={suplierContact}
+                                            onChange={(e) => setSuplierContact(e.target.value)} // Atualiza o estado
                                         />
-                                        <label htmlFor="address" className="text-right">
-                                            Endereço
-                                        </label>
+                                        <label htmlFor="address" className="text-right">Endereço</label>
                                         <Input
                                             id="address"
                                             className="col-span-3"
-                                            placeholder="Endereço"
+                                            placeholder="Escreva seu endereço"
+                                            value={suplierAddress}
+                                            onChange={(e) => setSuplierAdress(e.target.value)} // Atualiza o estado
                                         />
-                                    
                                     </div>
-                                    {/* Add more fields as needed */}
                                 </div>
-                                <Button type="submit">Salvar Fornecedor</Button>
+                                <Button onClick={handleAddSuplier}>Salvar Cliente</Button>
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -191,13 +194,10 @@ const Supliers = () => {
                                             <span className="sr-only">Image</span>
                                         </TableHead>
                                         <TableHead>Nome</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Documento</TableHead>
+                                        <TableHead>CNPJ</TableHead>
+                                        <TableHead>Contato</TableHead>
                                         <TableHead className="hidden md:table-cell">
-                                            Total de vendas
-                                        </TableHead>
-                                        <TableHead className="hidden md:table-cell">
-                                            Contato
+                                            Endereço
                                         </TableHead>
                                         <TableHead>
                                             <span className="sr-only">Ações</span>
@@ -205,231 +205,91 @@ const Supliers = () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                    {filteredSupliers.map((suplier) => (
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Laser Lemonade Machine
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Rascunho</Badge>
-                                        </TableCell>
-                                        <TableCell>072.935.159-95</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            25
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-07-12
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
+                                        <TableRow key={suplier.id}>
+                                            <TableCell className="hidden sm:table-cell"></TableCell>
+                                            <TableCell>{suplier.name}</TableCell>
+                                            <TableCell>{suplier.cnpj}</TableCell>
+                                            <TableCell>{suplier.contact}</TableCell>
+                                            <TableCell>{suplier.address}</TableCell>
+                                            <TableCell></TableCell>
+                                            <TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                                        <DropdownMenuItem onClick={() => handleEditSuplier(suplier)}>
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDeleteSuplier(suplier.id.toString())}>
+                                                            Deletar
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
 
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Hypernova Headphones
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>777.777.888-98</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            100
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-10-18
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            AeroGlow Desk Lamp
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>111.222.111-99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            50
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-11-29
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            TechTonic Energy Drink
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="secondary">Draft</Badge>
-                                        </TableCell>
-                                        <TableCell>$2.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            0
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2023-12-25 11:59 PM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Gamer Gear Pro Controller
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>$59.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            75
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2024-01-01 12:00 AM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="hidden sm:table-cell">
-
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            Luminous VR Headset
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">Ativo</Badge>
-                                        </TableCell>
-                                        <TableCell>$199.99</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            30
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            2024-02-14 02:14 PM
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        aria-haspopup="true"
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Toggle menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
                                 </TableBody>
                             </Table>
                         </CardContent>
+                        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Editar Fornecedor</DialogTitle>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <label htmlFor="name" className="text-right">
+                                            Nome
+                                        </label>
+                                        <Input
+                                            id="name"
+                                            className="col-span-3"
+                                            value={suplierName}
+                                            onChange={(e) => setSuplierName(e.target.value)}
+                                            placeholder="Nome do fornecedor"
+                                        />
+                                        <label htmlFor="document" className="text-right">
+                                            Documento
+                                        </label>
+                                        <Input
+                                            id="document"
+                                            className="col-span-3"
+                                            value={suplierCnpj}
+                                            onChange={(e) => setSuplierCnpj(e.target.value)}
+                                            placeholder="Documento"
+                                        />
+                                        <label htmlFor="contact" className="text-right">
+                                            Contato
+                                        </label>
+                                        <Input
+                                            id="contact"
+                                            className="col-span-3"
+                                            value={suplierContact}
+                                            onChange={(e) => setSuplierContact(e.target.value)}
+                                            placeholder="Contato"
+                                        />
+                                        <label htmlFor="address" className="text-right">
+                                            Endereço
+                                        </label>
+                                        <Input
+                                            id="address"
+                                            className="col-span-3"
+                                            value={suplierAddress}
+                                            onChange={(e) => setSuplierAdress(e.target.value)}
+                                            placeholder="Endereço"
+                                        />
+                                    </div>
+                                </div>
+                                <Button onClick={handleUpdateSuplier}>Salvar Alterações</Button>
+                            </DialogContent>
+                        </Dialog>
                         <CardFooter>
                             <div className="text-xs text-muted-foreground">
                                 Mostrando <strong>1-10</strong> de <strong>32</strong>{" "}

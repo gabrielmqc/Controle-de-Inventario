@@ -18,14 +18,14 @@ const postData = async (newSuplier: SuplierData): AxiosPromise<SuplierData> => {
 
 // Função para atualizar um produto (PUT)
 const updateData = async (updatedSuplier: SuplierData): AxiosPromise<SuplierData> => {
-    const response = await axios.put(`${API_URL}/supliers');/${updatedSuplier.id}`, updatedSuplier);
-    return response;
+  const response = await axios.put(`${API_URL}/supliers/${updatedSuplier.id}`, updatedSuplier);
+  return response;
 };
 
 // Função para deletar um produto (DELETE)
 const deleteData = async (suplierId: string): AxiosPromise<void> => {
-    const response = await axios.delete(`${API_URL}/supliers');/${suplierId}`);
-    return response;
+  const response = await axios.delete(`${API_URL}/supliers/${suplierId}`);
+  return response;
 };
 // Hook para buscar dados de produtos
 export function useSuplierData() {

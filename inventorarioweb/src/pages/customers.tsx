@@ -8,11 +8,13 @@ import { Table } from "@/components/ui/table";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useClientData, useDeleteClientData, usePostClientData, useUpdateClientData } from "@/hook/useClientData";
+import { useClientCount, useClientData, useDeleteClientData, usePostClientData, useUpdateClientData } from "@/hook/useClientData";
 import { ClientData } from "@/@types/ClientData";
 
 const Customers = () => {
+    
     const { data } = useClientData();
+    const { data: clientCount } = useClientCount();
     const { mutate: addClient } = usePostClientData();
     const { mutate: updateClient } = useUpdateClientData();
     const { mutate: deleteClient } = useDeleteClientData();
@@ -25,8 +27,6 @@ const Customers = () => {
     const [currentClientId, setCurrentClientId] = useState<string | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
-
-
 
     const handleAddClient = () => {
         const newClient = {
@@ -300,7 +300,7 @@ const Customers = () => {
                         </CardContent>
                         <CardFooter>
                             <div className="text-xs text-muted-foreground">
-                                Mostrando <strong>1-10</strong> de <strong>32</strong>{" "}
+                                Mostrando <strong>1-10</strong> de <strong>{clientCount}</strong>{" "}
                                 Clientes
                             </div>
                         </CardFooter>
