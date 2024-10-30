@@ -10,6 +10,10 @@ const fetchData = async (): AxiosPromise<SuplierData[]> => {
     return response;
 };
 
+const fetchSuplierCount = async (): AxiosPromise<number> => {
+  const response = axios.get(API_URL + '/supliers/count');
+  return response;
+};
 // Função para criar um novo produto (POST)
 const postData = async (newSuplier: SuplierData): AxiosPromise<SuplierData> => {
     const response = axios.post(API_URL + '/supliers', newSuplier);
@@ -38,6 +42,19 @@ export function useSuplierData() {
         ...query,
         data: query.data?.data,
     };
+}
+
+export function useSuplierCount() {
+  const query = useQuery({
+    queryFn: fetchSuplierCount,
+    queryKey: ['client-count'],
+    retry: 2,
+  });
+
+  return {
+    ...query,
+    data: query.data?.data, // retorna o número total de clientes
+  };
 }
 
 // Hook para criar um novo produto

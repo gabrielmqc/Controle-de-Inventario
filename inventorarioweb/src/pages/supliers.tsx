@@ -9,10 +9,11 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { SuplierData } from "@/@types/SuplierData";
-import { useSuplierData, usePostSuplierData, useUpdateSuplierData, useDeleteSuplierData } from "@/hook/useSuplierData";
+import { useSuplierData, usePostSuplierData, useUpdateSuplierData, useDeleteSuplierData, useSuplierCount } from "@/hook/useSuplierData";
 
 const Supliers = () => {
     const { data } = useSuplierData();
+    const {data : countSupliers} = useSuplierCount();
     const { mutate: addSuplier } = usePostSuplierData();
     const { mutate: updateSuplier } = useUpdateSuplierData();
     const { mutate: deleteSuplier } = useDeleteSuplierData();
@@ -292,7 +293,7 @@ const Supliers = () => {
                         </Dialog>
                         <CardFooter>
                             <div className="text-xs text-muted-foreground">
-                                Mostrando <strong>1-10</strong> de <strong>32</strong>{" "}
+                                Mostrando <strong>1-10</strong> de <strong>{countSupliers}</strong>{" "}
                                 Fornecedores
                             </div>
                         </CardFooter>

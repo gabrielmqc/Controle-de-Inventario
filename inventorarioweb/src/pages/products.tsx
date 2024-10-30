@@ -8,20 +8,26 @@ import { Table } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useDeleteProductData, usePostProductData, useProductData, useUpdateProductData } from "@/hook/useProductData";
+import { useDeleteProductData, usePostProductData, useProductCount, useProductData, useUpdateProductData } from "@/hook/useProductData";
 import { ProductData } from "@/@types/ProductData";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSuplierData } from "@/hook/useSuplierData";
 
 const Products = () => {
     const { data } = useProductData();
+    const { data: supliers } = useSuplierData();
     const { mutate: addProduct } = usePostProductData();
     const { mutate: updateProduct } = useUpdateProductData();
     const { mutate: deleteProduct } = useDeleteProductData();
+    const { data: productCount } = useProductCount();
 
     const [checkedItem, setCheckedItem] = useState<string | null>(null);
     const [productName, setProductName] = useState('');
+    const [productImage, setProductImage] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productQuantity, setProductQuantity] = useState('');
+    const [productSuplierID, setProductSuplierID] = useState('');
     const [currentProductId, setCurrentProductId] = useState<string | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
@@ -58,9 +64,11 @@ const Products = () => {
         const newProduct = {
             id: 0,
             name: productName,
+            image: productImage,
             description: productDescription,
             price: parseFloat(productPrice),
             quantity: parseInt(productQuantity, 10),
+            suplierID: parseInt(productSuplierID, 10)
         };
         addProduct(newProduct);
         resetForm();
@@ -68,9 +76,11 @@ const Products = () => {
     const handleEditProduct = (product: ProductData) => {
         setCurrentProductId((product.id).toString());
         setProductName(product.name);
+        setProductImage(product.image);
         setProductDescription(product.description);
         setProductPrice(product.price.toString());
         setProductQuantity(product.quantity.toString());
+        setProductSuplierID(product.suplierID.toString());
         setIsEditDialogOpen(true); // Abre o dialog de edição
     };
 
@@ -84,9 +94,11 @@ const Products = () => {
         const updatedProduct = {
             id: parseFloat(currentProductId),
             name: productName,
+            image: productImage,
             description: productDescription,
             price: parseFloat(productPrice),
             quantity: parseInt(productQuantity, 10),
+            suplierID: parseInt(productSuplierID, 10)
         };
 
         updateProduct(updatedProduct);
@@ -100,10 +112,12 @@ const Products = () => {
 
     const resetForm = () => {
         setProductName('');
+        setProductImage('');
         setProductDescription('');
         setProductPrice('');
         setProductQuantity('');
         setCurrentProductId(null);
+        setProductSuplierID('');
     };
 
     // Função para filtrar e ordenar produtos
@@ -179,6 +193,7 @@ const Products = () => {
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
                                     <div className="grid grid-cols-4 items-center gap-4">
+
                                         <label htmlFor="name" className="text-right">Nome</label>
                                         <Input
                                             id="name"
@@ -188,6 +203,34 @@ const Products = () => {
                                             onChange={(e) => setProductName(e.target.value)} // Atualiza o estado
                                         />
                                         {errors.name && <p className="text-red-500 text-xs col-span-4">{errors.name}</p>}
+                                        <label htmlFor="suplier" className="text-right">
+                                            Fornecedor
+                                        </label>
+                                        <div className="col-span-3">
+                                            <Select
+                                                value={productSuplierID}
+                                                onValueChange={(value) => setProductSuplierID(value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Selecione um fornecedor" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {supliers?.map((suplier) => (
+                                                        <SelectItem key={suplier.id} value={suplier.id.toString()}>
+                                                            {suplier.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <label htmlFor="image" className="text-right">Imagem</label>
+                                        <Input
+                                            id="image"
+                                            className="col-span-3"
+                                            placeholder="URL da imagem"
+                                            value={productImage}
+                                            onChange={(e) => setProductImage(e.target.value)} // Atualiza o estado
+                                        />
 
                                         <label htmlFor="description" className="text-right">Descrição</label>
                                         <Input
@@ -244,6 +287,7 @@ const Products = () => {
                                             <span className="sr-only">Image</span>
                                         </TableHead>
                                         <TableHead>Nome</TableHead>
+                                        <TableHead>Fornecedor</TableHead>
                                         <TableHead>Preço</TableHead>
                                         <TableHead>Quantidade em Estoque</TableHead>
                                         <TableHead className="hidden md:table-cell">
@@ -259,15 +303,18 @@ const Products = () => {
 
                                         <TableRow key={product.id}>
                                             <TableCell className="hidden sm:table-cell">
-
+                                                <img src={product.image} alt="" />
 
                                             </TableCell>
                                             <TableCell>{product.name}</TableCell>
-
+                                            {supliers?.map((suplier) => (
+                                                suplier.id === product.suplierID ? (
+                                                    <TableCell>{suplier.name}</TableCell>
+                                                ) : null
+                                            ))}
                                             <TableCell>R$ {product.price}</TableCell>
                                             <TableCell>{product.quantity}</TableCell>
                                             <TableCell>{product.description}</TableCell>
-                                            <TableCell></TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -293,7 +340,7 @@ const Products = () => {
                             </Table>
                             {/* Dialog de Edição */}
                             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                                <DialogContent className="sm:max-w-[425px]">
+                                <DialogContent>
                                     <DialogHeader>
                                         <DialogTitle>Editar Produto</DialogTitle>
                                     </DialogHeader>
@@ -309,6 +356,36 @@ const Products = () => {
                                                 onChange={(e) => setProductName(e.target.value)}
                                                 placeholder="Nome do produto"
                                             />
+                                            <label htmlFor="suplier" className="text-right">
+                                                Fornecedor
+                                            </label>
+                                            <div className="col-span-3">
+                                                <Select
+                                                    disabled={true}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Selecione um fornecedor" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {supliers?.map((suplier) => (
+                                                            <SelectItem key={suplier.id} value={suplier.id.toString()}>
+                                                                {suplier.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <label htmlFor="image" className="text-right">
+                                                Imagem
+                                            </label>
+                                            <Input
+                                                id="image"
+                                                className="col-span-3"
+                                                value={productImage}
+                                                onChange={(e) => setProductImage(e.target.value)}
+                                                placeholder="URL da imagem"
+                                            />
+
                                             <label htmlFor="description" className="text-right">
                                                 Descrição
                                             </label>
@@ -349,7 +426,7 @@ const Products = () => {
                         </CardContent>
                         <CardFooter>
                             <div className="text-xs text-muted-foreground">
-                                Mostrando <strong>1-10</strong> de <strong>32</strong>{" "}
+                                Mostrando <strong>1-10</strong> de <strong>{productCount}</strong>{" "}
                                 produtos
                             </div>
                         </CardFooter>

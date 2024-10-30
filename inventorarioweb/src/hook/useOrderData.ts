@@ -10,6 +10,10 @@ const fetchData = async (): AxiosPromise<OrderData[]> => {
     return response;
 };
 
+const fetchOrderCount = async (): AxiosPromise<number> => {
+  const response = axios.get(API_URL + '/orders/count');
+  return response;
+};
 // Função para criar um novo produto (POST)
 const postData = async (newOrder: OrderData): AxiosPromise<OrderData> => {
     const response = axios.post(API_URL + '/orders', newOrder);
@@ -38,6 +42,19 @@ export function useOrderData() {
         ...query,
         data: query.data?.data,
     };
+}
+
+export function useOrderCount() {
+  const query = useQuery({
+    queryFn: fetchOrderCount,
+    queryKey: ['client-count'],
+    retry: 2,
+  });
+
+  return {
+    ...query,
+    data: query.data?.data, // retorna o número total de clientes
+  };
 }
 
 // Hook para criar um novo produto

@@ -10,6 +10,11 @@ const fetchData = async (): AxiosPromise<ProductData[]> => {
     return response;
 };
 
+const fetchProductCount = async (): AxiosPromise<number> => {
+  const response = axios.get(API_URL + '/products/count');
+  return response;
+};
+
 // Função para criar um novo produto (POST)
 const postData = async (newProduct: ProductData): AxiosPromise<ProductData> => {
     const response = axios.post(API_URL + '/products', newProduct);
@@ -37,6 +42,19 @@ export function useProductData() {
         ...query,
         data: query.data?.data,
     };
+}
+
+export function useProductCount() {
+  const query = useQuery({
+    queryFn: fetchProductCount,
+    queryKey: ['client-count'],
+    retry: 2,
+  });
+
+  return {
+    ...query,
+    data: query.data?.data, // retorna o número total de clientes
+  };
 }
 
 // Hook para criar um novo produto

@@ -12,11 +12,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useClientData } from "@/hook/useClientData"
+import { useOrderCount } from "@/hook/useOrderData";
 
 
 const Orders = () => {
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
   const { data: clients } = useClientData();
+  const { data: orderCount } = useOrderCount();
+
 
   return (
 
@@ -43,7 +46,7 @@ const Orders = () => {
                     </span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Novo Pedido</DialogTitle>
                   </DialogHeader>
@@ -95,7 +98,7 @@ const Orders = () => {
           <Card x-chunk="dashboard-05-chunk-1">
             <CardHeader className="pb-2">
               <CardDescription>Numero de pedidos</CardDescription>
-              <CardTitle className="text-4xl">55</CardTitle>
+              <CardTitle className="text-4xl">{orderCount}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-xs text-muted-foreground">
