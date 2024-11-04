@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
 import {
-    Search,
     User,
 } from "lucide-react"
 import {
@@ -10,7 +9,6 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 import useAuth from "@/hook/useAuth";

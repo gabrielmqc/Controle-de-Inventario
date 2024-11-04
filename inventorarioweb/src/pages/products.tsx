@@ -31,6 +31,7 @@ const Products = () => {
     const [currentProductId, setCurrentProductId] = useState<string | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [searchTerm] = useState<string>(""); // Estado para o texto de filtro
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const [errors, setErrors] = useState({
         name: '',
@@ -41,26 +42,26 @@ const Products = () => {
 
     const handleAddProduct = () => {
         setErrors({ name: '', price: '', quantity: '' });
-
+    
         let hasErrors = false;
-
+    
         if (!productName.trim()) {
             setErrors(prev => ({ ...prev, name: 'Nome é obrigatório' }));
             hasErrors = true;
         }
-
+    
         if (parseFloat(productPrice) <= 0) {
             setErrors(prev => ({ ...prev, price: 'Preço deve ser maior que zero' }));
             hasErrors = true;
         }
-
+    
         if (parseInt(productQuantity, 10) <= 0) {
             setErrors(prev => ({ ...prev, quantity: 'Quantidade deve ser maior que zero' }));
             hasErrors = true;
         }
-
+    
         if (hasErrors) return;
-
+    
         const newProduct = {
             id: 0,
             name: productName,
@@ -72,7 +73,9 @@ const Products = () => {
         };
         addProduct(newProduct);
         resetForm();
+        setIsDialogOpen(false); // Close dialog after saving
     };
+
     const handleEditProduct = (product: ProductData) => {
         setCurrentProductId((product.id).toString());
         setProductName(product.name);
